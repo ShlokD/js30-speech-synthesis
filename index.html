@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Speech Synthesis</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="voiceinator">
+
+      <h1>The Voiceinator 5000</h1>
+
+      <select name="voice" id="voices">
+        <option value="">Select A Voice</option>
+      </select>
+
+      <label for="rate">Rate:</label>
+      <input name="rate" type="range" min="0" max="3" value="1" step="0.1">
+
+      <label for="pitch">Pitch:</label>
+
+      <input name="pitch" type="range" min="0" max="2" step="0.1">
+      <textarea name="text">Hello! I love JavaScript 👍</textarea>
+      <button id="stop">Stop!</button>
+      <button id="speak">Speak</button>
+
+    </div>
+
+<script>
+  const msg = new SpeechSynthesisUtterance();
+  let voices = [];
+  const voicesDropdown = document.querySelector('[name="voice"]');
+  const options = document.querySelectorAll('[type="range"], [name="text"]');
+  const speakButton = document.querySelector('#speak');
+  const stopButton = document.querySelector('#stop');
+
+  msg.text = document.querySelector('[name="text"').value;
+
+  const onVoiceChange = ev => {
+    const englishVoices = ev.target.getVoices()
+                          .filter((voiceOption) => voiceOption.lang === "en-US")
+                          .map(voice => `<option name="${voice.name}">${voice.name} ${voice.lang}</option>`)
+                          .join('');
+
+    voices = [...ev.target.getVoices()];
+    voicesDropdown.innerHTML = englishVoices;
+  };
+
+  const setVoices = ev => {
+    const index = ev.target.selectedIndex;
+    const selectedVoiceName = ev.target.options[index].getAttribute('name');
+    const selectedVoice  = voices.find((voice) => voice.name === selectedVoiceName);
+    
+    if (selectedVoice) {
+      msg.voice = selectedVoice;
+    }
+  }
+
+  const onOptionsChange = ev => {
+    const type = ev.target.name;
+    console.log(ev);
+    if (msg) {
+      console.log('here');
+      msg[`${type}`] = parseFloat(ev.target.value);
+      console.log(speechSynthesis);
+    }
+  }
+
+  speechSynthesis.addEventListener('voiceschanged', onVoiceChange);
+  voicesDropdown.addEventListener('change', setVoices);
+  speakButton.addEventListener('click', () => speechSynthesis && speechSynthesis.speak(msg));
+  stopButton.addEventListener('click', () => speechSynthesis && speechSynthesis.cancel());
+  options.forEach((option) => option.addEventListener('change', onOptionsChange))
+</script>
+
+</body>
+</html>
